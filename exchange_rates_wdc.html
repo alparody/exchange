@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://connectors.tableau.com/libs/tableauwdc-2.3.latest.js"></script>
+    <script>
+      (function() {
+        var myConnector = tableau.makeConnector();
+
+        myConnector.getSchema = function(schemaCallback) {
+          var cols = [
+            { id: "currency", dataType: tableau.dataTypeEnum.string },
+            { id: "rate", dataType: tableau.dataTypeEnum.float }
+          ];
+          var tableSchema = {
+            id: "exchangeRates",
+            alias: "USD Exchange Rates",
+            columns: cols
+          };
+          schemaCallback([tableSchema]);
+        };
+
+        myConnector.getData = function(table, doneCallback) {
+          fetch("https://api.exchangerate-api.com/v4/latest/USD")
+            .then(response => response.json())
+            .then(data => {
+              var tableData = [];
+              for (var key in data.rates) {
+                tableData.push({ currency: key, rate: data.rates[key] });
+              }
+              table.appendRows(tableData);
+              doneCallback();
+            });
+        };
+
+        tableau.registerConnector(myConnector);
+
+        document.querySelector("#submitButton").addEventListener("click", function() {
+          tableau.connectionName = "Exchange Rates API";
+          tableau.submit();
+        });
+      })();
+    </script>
+  </head>
+  <body>
+    <h2>Exchange Rate Data</h2>
+    <button id="submitButton">Get Data!</button>
+  </body>
+</html>
