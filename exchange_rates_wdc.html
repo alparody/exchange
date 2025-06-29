@@ -11,7 +11,7 @@
     ]
   }]);};
   myConnector.getData=function(table,done){
-    fetch('https://api.exchangerate.host/latest?base=USD')
+    fetch('https://api.exchangerate.host/live?access_key=6265ef2840f5c127624ee7d74a695ec8&format=1')
       .then(r=>r.json()).then(d=>{
         var data=Object.entries(d.rates).map(([c,r])=>({currency:c,rate:r}));
         table.appendRows(data); done();
